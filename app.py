@@ -3,6 +3,14 @@ import re
 
 KNOWLEDGE_BASE = [
     (
+        "What is AI?",
+        "Artificial intelligence (AI) is the ability of a computer system to perform tasks that usually need human intelligence, such as understanding language or recognizing patterns.",
+    ),
+    (
+        "What is A.I.?",
+        "Artificial intelligence (AI) is the ability of a computer system to perform tasks that usually need human intelligence, such as understanding language or recognizing patterns.",
+    ),
+    (
         "What is artificial intelligence?",
         "Artificial intelligence (AI) is the ability of a computer system to perform tasks that usually need human intelligence, such as understanding language or recognizing patterns.",
     ),
@@ -31,13 +39,27 @@ KNOWLEDGE_BASE = [
 STOP_WORDS = {
     "a", "an", "and", "are", "can", "do", "does", "explain", "for", "how",
     "i", "is", "it", "me", "of", "please", "tell", "that", "the", "this",
-    "to", " was", "what", "when", "where", "which", "who", "why", "with",
+    "to", "was", "what", "when", "where", "which", "who", "why", "with",
+}
+
+
+CONCEPT_ALIASES = {
+    "ai": {"ai", "artificial", "intelligence"},
+    "machine_learning": {"machine", "learning", "ml"},
+    "nlp": {"nlp", "natural", "language", "processing"},
+    "question_answering": {"question", "answering", "qa", "system"},
 }
 
 
 def important_words(text):
     words = re.findall(r"[a-z0-9]+", text.lower())
-    return {word for word in words if word not in STOP_WORDS}
+    keyword_set = {word for word in words if word not in STOP_WORDS}
+
+    for concept, alias_words in CONCEPT_ALIASES.items():
+        if set(alias_words) & set(words):
+            keyword_set |= alias_words
+
+    return keyword_set
 
 
 def answer_question(question):
@@ -50,10 +72,14 @@ def answer_question(question):
 
     for known_question, answer in KNOWLEDGE_BASE:
         known_words = important_words(known_question)
-        score = len(question_words & known_words) / len(question_words)
-        if score > best_score:
+        overlap = len(question_words & known_words)
+        score = overlap / max(len(question_words), 1)
+        if overlap and score > best_score:
             best_score = score
             best_answer = answer
+
+    if best_answer is None and not question_words:
+        return "Please ask a question with a few topic words."
 
     if best_score < 0.25:
         return "I do not know that yet. Add information about it to KNOWLEDGE_BASE in app.py."
