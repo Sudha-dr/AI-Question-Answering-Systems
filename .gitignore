@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -6,3 +7,16 @@ __pycache__/
 venv/
 .pytest_cache/
 .DS_Store
+
+# Trained models and their labels: regenerate with train.py
+*.keras
+*.h5
+class_names.json
+
+# Dataset images: regenerate with download_dataset.py, or add your own.
+# The folder structure itself is kept via the .gitkeep files.
+AI-Image-Classification/dataset/**/*.png
+AI-Image-Classification/dataset/**/*.jpg
+AI-Image-Classification/dataset/**/*.jpeg
+AI-Image-Classification/dataset/**/*.bmp
+AI-Image-Classification/dataset/**/*.gif
